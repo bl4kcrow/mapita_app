@@ -12,10 +12,12 @@ class MapView extends ConsumerWidget {
     super.key,
     required this.initialLocation,
     required this.polylines,
+    required this.markers,
   });
 
   final LatLng initialLocation;
   final Set<Polyline> polylines;
+  final Set<Marker> markers;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,6 +40,7 @@ class MapView extends ConsumerWidget {
           zoomControlsEnabled: false,
           myLocationButtonEnabled: false,
           polylines: polylines,
+          markers: markers,
           style: jsonEncode(uberMapTheme),
           onMapCreated: (controller) {
             ref.read(mapProvider.notifier).onInitMap(controller);

@@ -28,25 +28,28 @@ class SearchNotifier extends Notifier<SearchState> {
   }
 
   Future<RouteDestination> getCoorsStartToEnd(LatLng start, LatLng end) async {
-    final trafficResponse = await _mapsService.getCoorsStartToEnd(
+    final routeResponse = await _mapsService.getCoorsStartToEnd(
       start,
       end,
     );
 
-    final distance = trafficResponse.routes.first.distanceMeters;
-    final duration = trafficResponse.routes.first.duration;
+    final distance = routeResponse.routes.first.distanceMeters;
+    final duration = routeResponse.routes.first.duration;
     final decodedPolylines = decodePolyline(
-      trafficResponse.routes.first.segment.encodedPolyline,
+      routeResponse.routes.first.segment.encodedPolyline,
     );
 
     final points = decodedPolylines
         .map((coor) => LatLng(coor[0].toDouble(), coor[1].toDouble()))
         .toList();
 
+    final finalPlace = await _mapsService.getPlaceByCoors(end);
+
     return RouteDestination(
       points: points,
       duration: duration,
       distance: distance,
+      finalPlace: finalPlace,
     );
   }
 

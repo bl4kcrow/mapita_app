@@ -12,6 +12,8 @@ class MapsService {
       'https://routes.googleapis.com/directions/v2:computeRoutes';
   final String _baseSearchPlacesUrl =
       'https://places.googleapis.com/v1/places:searchText';
+  final String _baseNearbySearchPlaceUrl =
+      'https://places.googleapis.com/v1/places:searchNearby';
 
   final Map<String, dynamic> _headers = {
     'Content-Type': 'application/json',
@@ -20,7 +22,7 @@ class MapsService {
     'X-Goog-Api-Key': dotenv.get('GOOGLE_MAPS_API_KEY'),
   };
 
-  Future<TrafficResponse> getCoorsStartToEnd(LatLng start, LatLng end) async {
+  Future<RouteResponse> getCoorsStartToEnd(LatLng start, LatLng end) async {
     _headers['X-Goog-FieldMask'] =
         'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline';
 
@@ -53,7 +55,7 @@ class MapsService {
       data: body,
     );
 
-    final data = TrafficResponse.fromMap(response.data);
+    final data = RouteResponse.fromMap(response.data);
 
     return data;
   }
@@ -87,5 +89,30 @@ class MapsService {
     final data = PlacesResponse.fromMap(response.data);
 
     return data.places;
+  }
+
+  Future<Place> getPlaceByCoors(LatLng coors) async {
+    _headers['X-Goog-FieldMask'] =
+        'places.displayName,places.location,places.formattedAddress';
+
+    final Map<String, dynamic> body = {
+      "maxResultCount": 1,
+      "locationRestriction": {
+        "circle": {
+          "center": {"latitude": coors.latitude, "longitude": coors.longitude},
+          "radius": 30.0,
+        },
+      },
+    };
+
+    final response = await _dioMaps.post(
+      _baseNearbySearchPlaceUrl,
+      options: Options(headers: _headers),
+      data: body,
+    );
+
+    final data = PlacesResponse.fromMap(response.data);
+
+    return data.places.first;
   }
 }

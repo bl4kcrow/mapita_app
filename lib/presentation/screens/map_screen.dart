@@ -44,6 +44,7 @@ class MapScreenState extends ConsumerState<MapScreen> {
                   MapView(
                     initialLocation: location.lastKnownLocation!,
                     polylines: mapState.polylines.values.toSet(),
+                    markers: mapState.markers.values.toSet(),
                   ),
                   const CustomSearchBar(),
                   const ManualMarker(),

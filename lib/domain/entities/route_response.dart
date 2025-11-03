@@ -1,24 +1,25 @@
 import 'dart:convert';
 
-class TrafficResponse {
+class RouteResponse {
     final List<Route> routes;
 
-    TrafficResponse({
+  RouteResponse({
         required this.routes,
     });
 
-    TrafficResponse copyWith({
+  RouteResponse copyWith({
         List<Route>? routes,
     }) => 
-        TrafficResponse(
+      RouteResponse(
             routes: routes ?? this.routes,
         );
 
-    factory TrafficResponse.fromJson(String str) => TrafficResponse.fromMap(json.decode(str));
+  factory RouteResponse.fromJson(String str) =>
+      RouteResponse.fromMap(json.decode(str));
 
     String toJson() => json.encode(toMap());
 
-    factory TrafficResponse.fromMap(Map<String, dynamic> json) => TrafficResponse(
+  factory RouteResponse.fromMap(Map<String, dynamic> json) => RouteResponse(
         routes: List<Route>.from(json["routes"].map((x) => Route.fromMap(x))),
     );
 

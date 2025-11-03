@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mapita_app/config/helpers/widgets_to_marker.dart';
 
 import 'package:mapita_app/domain/entities/entities.dart';
 import 'package:mapita_app/presentation/providers/providers.dart';
@@ -83,7 +84,41 @@ class MapNotifier extends Notifier<MapState> {
     final polylines = Map<String, Polyline>.from(state.polylines);
     polylines['route'] = myRoute;
 
-    state = state.copyWith(polylines: polylines);
+    double kms = (destination.distance / 1000);
+    kms = (kms * 100).floorToDouble();
+    kms /= 100;
+
+    int seconds = int.parse(destination.duration.replaceAll('s', ''));
+    Duration duration = Duration(seconds: seconds);
+
+    final startMarkerIcon = await getStartCustomMarker(
+      time: duration.inHours != 0 ? duration.inHours : duration.inMinutes,
+      timeUnit: duration.inHours != 0 ? 'HRS' : 'MIN',
+      destination: 'My location',
+    );
+    final endMarkerIcon = await getEndCustomMarker(
+      kms: kms.toInt(),
+      destination: destination.finalPlace.displayName.text,
+    );
+
+    final startMarker = Marker(
+      markerId: MarkerId('start'),
+      anchor: const Offset(0.1, 1),
+      position: destination.points.first,
+      icon: startMarkerIcon,
+    );
+
+    final endMarker = Marker(
+      markerId: MarkerId('end'),
+      position: destination.points.last,
+      icon: endMarkerIcon,
+    );
+
+    final markers = Map<String, Marker>.from(state.markers);
+    markers['start'] = startMarker;
+    markers['end'] = endMarker;
+
+    state = state.copyWith(polylines: polylines, markers: markers);
   }
 
   void onToggleUserRoute() {
